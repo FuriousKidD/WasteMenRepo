@@ -2,27 +2,27 @@ package waste.men.datastructures.impl.linear;
 
 import waste.men.datastructures.api.*;
 
-public class DLinkedList <E> implements LinkedListInterface<E>{
+public class DLinkedList <E> implements PositionalList<E>{
 	
 	/**
 	 * 
 	 */
-	class Node{
+	private class Node<E> implements Position<E>{
 		private E element;
-		private Node prev;
-		private Node next;
+		private Node<E> prev;
+		private Node<E> next;
 		
-		public Node(E element, Node prev, Node next) {
+		public Node(E element, Node<E> prev, Node<E> next) {
 			setElement(element);
 			setPrev(prev);
 			setNext(next);
 		}
 		
-		public void setPrev(Node prev) {
+		public void setPrev(Node<E> prev) {
 			this.prev = prev;
 		}
 		
-		public void setNext(Node next) {
+		public void setNext(Node<E> next) {
 			this.next = next;
 		}
 		
@@ -30,24 +30,29 @@ public class DLinkedList <E> implements LinkedListInterface<E>{
 			this.element = element;
 		}
 		
-		public Node getPrev() {
+		public Node<E> getPrev() {
 			return this.prev;
 		}
 		
-		public Node getNext() {
+		public Node<E> getNext() {
 			return this.next;
 		}
+
+		@Override
+		public E getElement() throws IllegalStateException {
+			if(getNext() == null) throw new IllegalStateException("Position is no longer valid");
+			return this.element;
+		}
 		
-		
-	}//end of inner Node class
+	}//end of inner Node<E> class
 	
 	/*
 	 * 
 	 */
-	private Node header;
-	private Node trailer;
-	private Node prev;
-	private Node next;
+	private Node<E> header;
+	private Node<E> trailer;
+	private Node<E> prev;
+	private Node<E> next;
 	private E element;
 	private int size;
 	
@@ -55,9 +60,9 @@ public class DLinkedList <E> implements LinkedListInterface<E>{
 	 * 
 	 */
 	public DLinkedList() {
-		header = new Node(null, null, null);
-		trailer = new Node(null, header, null);
-		header.next = trailer;
+		header = new Node<>(null, null, null);
+		trailer = new Node<>(null, header, null);
+		header.setNext(trailer);
 		size = 0;
 	}
 	
@@ -137,7 +142,7 @@ public class DLinkedList <E> implements LinkedListInterface<E>{
 	/**
 	 * 
 	 */
-	public E getNode(int i) {
+	public E getNode<E>(int i) {
 		// TODO Auto-generated method stub
 		return element;
 	}
@@ -165,22 +170,22 @@ public class DLinkedList <E> implements LinkedListInterface<E>{
 	 * @param prev
 	 * @param next
 	 */
-	private void addBetween(E element, Node prev, Node next) {
+	private void addBetween(E element, Node<E> prev, Node<E> next) {
 		
 		if(isEmpty()) {
-			Node currentNode = new Node(element,header,trailer);
-			currentNode.prev = header;
-			currentNode.next = trailer;
-			header.next = currentNode;
-			trailer.prev = currentNode;
+			Node<E> currentNode<E> = new Node<E>(element,header,trailer);
+			currentNode<E>.prev = header;
+			currentNode<E>.next = trailer;
+			header.next = currentNode<E>;
+			trailer.prev = currentNode<E>;
 			size++;
 		}
 		else {
-			Node currentNode = new Node(element, prev, next);
-			currentNode.prev = prev;
-			currentNode.next = next;
-			prev.next = currentNode;
-			next.prev = currentNode;
+			Node<E> currentNode<E> = new Node<E>(element, prev, next);
+			currentNode<E>.prev = prev;
+			currentNode<E>.next = next;
+			prev.next = currentNode<E>;
+			next.prev = currentNode<E>;
 			size++;
 		}
 	}
@@ -193,12 +198,12 @@ public class DLinkedList <E> implements LinkedListInterface<E>{
 	 * @return
 	 * @throws NullPointerException
 	 */
-	private E removeBetween(Node current, Node prev, Node next) throws NullPointerException {
+	private E removeBetween(Node<E> current, Node<E> prev, Node<E> next) throws NullPointerException {
 		
 		if(isEmpty()) 
 			return null;
 		else if(current == null)
-			throw new NullPointerException("Current Node is null!");
+			throw new NullPointerException("Current Node<E> is null!");
 		else{
 			E removed = current.element;
 			prev.next = current.next;
@@ -211,21 +216,21 @@ public class DLinkedList <E> implements LinkedListInterface<E>{
 	/**
 	 * @return the prev
 	 */
-	public Node getPrev() {
+	public Node<E> getPrev() {
 		return prev;
 	}
 
 	/**
 	 * @param prev the prev to set
 	 */
-	public void setPrev(Node prev) {
+	public void setPrev(Node<E> prev) {
 		this.prev = prev;
 	}
 
 	/**
 	 * @param next the next to set
 	 */
-	public void setNext(Node next) {
+	public void setNext(Node<E> next) {
 		this.next = next;
 	}
 
