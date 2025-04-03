@@ -15,19 +15,19 @@ public interface PositionalList <E>{
 	public int size();
 	
 	/**
-	 * 
+	 * Checks if the list is empty
 	 * @return true if there are no positions
 	 */
 	public boolean isEmpty();
 	
 	/**
-	 * 
+	 * Checks for the first position in the list
 	 * @return the first position in the list
 	 */
 	public Position<E> first();
 	
 	/**
-	 * 
+	 * Checks for the last position in the list
 	 * @return the last position in the list
 	 */
 	public Position<E> last();
@@ -94,11 +94,11 @@ public interface PositionalList <E>{
 	public E set(Position<E> p, E element) throws IllegalArgumentException;
 	
 	/**
-	 * Removes the element stored at position p
+	 * Removes the element stored at position p, this invalidates p
 	 * @param p
 	 * @param element
 	 * @return the removed element
 	 * @throws IllegalArgumentException if the passed position does not exist
 	 */
-	public E remove(Position<E> p, E element) throws IllegalArgumentException;
+	public E remove(Position<E> p) throws IllegalArgumentException;
 };

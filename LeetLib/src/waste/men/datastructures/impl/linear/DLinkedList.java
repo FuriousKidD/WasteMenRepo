@@ -7,6 +7,7 @@ public class DLinkedList <E> implements PositionalList<E>{
 	/**
 	 * 
 	 */
+	@SuppressWarnings("hiding")
 	private class Node<E> implements Position<E>{
 		private E element;
 		private Node<E> prev;
@@ -51,9 +52,6 @@ public class DLinkedList <E> implements PositionalList<E>{
 	 */
 	private Node<E> header;
 	private Node<E> trailer;
-	private Node<E> prev;
-	private Node<E> next;
-	private E element;
 	private int size;
 	
 	/**
@@ -66,58 +64,122 @@ public class DLinkedList <E> implements PositionalList<E>{
 		size = 0;
 	}
 	
-	@Override
-	/**
-	 * 
+	/*
+	 * The following two methods are utility methods used for 
+	 * validating the conversion between nodes and position, ensuring
+	 * that this class is robust and highly abstracts the nodes from the user
 	 */
-	public void addFirst(E element) {
-		// TODO Auto-generated method stub
-		addBetween(element,header,header.next);
-	}
-
-	@Override
+	
 	/**
-	 * 
+	 * Checks if the position is valid, casts the position
+	 * to a node, then returns a node
 	 */
-	public void addLast(E element) {
-		// TODO Auto-generated method stub
-		addBetween(element, trailer.prev, trailer);
-		
-	}
-
-	@Override
-	/**
-	 * 
-	 */
-	public E first() {
-		// TODO Auto-generated method stub
-		return (header.next == null ? null : header.next.element);
-	}
-
-	@Override
-	/**
-	 * 
-	 */
-	public E last() {
-		// TODO Auto-generated method stub
-		return (trailer.prev == null ? null : trailer.prev.element);
+	private Node<E> validate(Position<E> p) throws IllegalArgumentException{
+		//check if the position is an instance of node
+		if( !(p instanceof Node) ) 
+			throw new IllegalArgumentException("Invalid position passed!");
+		Node<E> node = (Node<E>)p; // safely casting position to a node
+		if(node.getNext() == null)//checks if position passed, still exists in the list
+			throw new IllegalArgumentException("position given is no longer in the list");
+		return node;//return the node representation of the given position
 	}
 	
 	/**
-	 * 
+	 * returns the given node as a position
 	 */
+	private Position<E> position(Node<E> node){
+		if(node == header || node == trailer)
+			return null;//sentinels are not to be exposed to the user of this class
+		return node;//implicitly casts the given node to type Position<E>
+	}
+	
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public Position<E> addFirst(E element) {
+		// TODO Auto-generated method stub
+		return addBetween(element,header,header.getNext());
+	}
+
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public Position<E> addLast(E element) {
+		// TODO Auto-generated method stub
+		return addBetween(element, trailer.getPrev(), trailer);
+	}
+
+	@Override
+	/**
+	 *{@inheritDoc} 
+	 */
+	public Position<E> first() {
+		return position(header.getNext());
+	}
+
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public Position<E> last() {
+		return position(trailer.getPrev()); 
+	}
+	
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public Position<E> before(Position<E> p){
+		Node<E> tempNode = validate(p);//validate the given position and returns its node representation
+		return position(tempNode.getPrev());//gets and returns the previous position
+	}
+	
+	@Override
+	public Position<E> after(Position<E> p){
+		Node<E> tempNode = validate(p);//validate the given position and return its node
+		return position(tempNode.getNext());// gets and returns the next position
+	}
+	
+	/**
+	 *{@inheritDoc}
+	 */
+	public E remove(Position<E> p)throws IllegalArgumentException{
+		Node<E> tempNode = validate(p);
+		Node<E> tempNodePrev = tempNode.getPrev();
+		Node<E> tempNodeNext = tempNode.getNext();
+		
+		//Making the previous to point to the next
+		tempNodePrev.setNext(tempNodeNext);
+		//Making the next's previous to point to tempNodePrev
+		tempNodeNext.setPrev(tempNodePrev);
+		size--;
+		
+		E removedElement = tempNode.getElement();
+		
+		//Helping the garbage collector
+		tempNode.setElement(null);
+		tempNode.setNext(null);
+		tempNode.setPrev(null);
+		
+		return removedElement;
+	}
+	/**
+	 * Removes the first position from the list
+	 * @return the removed position 
+	 */
 	public E removeFirst() {
 		// TODO Auto-generated method stub
-		return removeBetween(header.next, header, header.next.next);
+		return remove(first());
 	}
 	
 	/**
-	 * 
+	 * Removes the last position from the list
 	 * @return
 	 */
 	public E removeLast() {
-		return removeBetween(trailer.prev, trailer, trailer.prev.next);
+		return remove(last());
 	}
 
 	@Override
@@ -131,114 +193,56 @@ public class DLinkedList <E> implements PositionalList<E>{
 
 	@Override
 	/**
-	 * 
-	 */
-	public E getNext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	/**
-	 * 
-	 */
-	public E getNode<E>(int i) {
-		// TODO Auto-generated method stub
-		return element;
-	}
-
-	@Override
-	/**
-	 * 
+	 * {@inheritDoc}
 	 */
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return size;
 	}
 	
 	@Override
 	/**
-	 * 
+	 * {@inheritDoc}
 	 */
 	public String toString() {
 		return null;
 	}
 	
 	/**
-	 * 
-	 * @param element
-	 * @param prev
-	 * @param next
+	 * Adds an element between two given positions in the linked list.
+	 * Creates a new position that will contain the element and will be between
+	 * the two given nodes
 	 */
-	private void addBetween(E element, Node<E> prev, Node<E> next) {
+	private Position<E> addBetween(E element, Node<E> prev, Node<E> next) {
 		
-		if(isEmpty()) {
-			Node<E> currentNode<E> = new Node<E>(element,header,trailer);
-			currentNode<E>.prev = header;
-			currentNode<E>.next = trailer;
-			header.next = currentNode<E>;
-			trailer.prev = currentNode<E>;
-			size++;
-		}
-		else {
-			Node<E> currentNode<E> = new Node<E>(element, prev, next);
-			currentNode<E>.prev = prev;
-			currentNode<E>.next = next;
-			prev.next = currentNode<E>;
-			next.prev = currentNode<E>;
-			size++;
-		}
+		Node<E> newNode = new Node<>(element, prev, next);
+		prev.setNext(newNode);
+		next.setPrev(newNode);
+		size++;
+		return newNode;//implicitly is converted to Position<E>
 	}
 	
 	/**
-	 * 
-	 * @param current
-	 * @param prev
-	 * @param next
-	 * @return
-	 * @throws NullPointerException
+	 * {@inheritDoc}
 	 */
-	private E removeBetween(Node<E> current, Node<E> prev, Node<E> next) throws NullPointerException {
-		
-		if(isEmpty()) 
-			return null;
-		else if(current == null)
-			throw new NullPointerException("Current Node<E> is null!");
-		else{
-			E removed = current.element;
-			prev.next = current.next;
-			next.prev = current.prev;
-			size--;
-			return removed;	
-		}
+	public E set(Position<E> p,E element) {
+		Node<E> tempNode = validate(p);
+		tempNode.setElement(element);
+		return tempNode.getElement();
 	}
 
+	@Override
 	/**
-	 * @return the prev
+	 * {@inheritDoc}
 	 */
-	public Node<E> getPrev() {
-		return prev;
+	public Position<E> addBefore(Position<E> p, E element) throws IllegalArgumentException {
+		Node<E> tempNode = validate(p);
+		return addBetween(element, tempNode.getPrev(), tempNode);
 	}
 
-	/**
-	 * @param prev the prev to set
-	 */
-	public void setPrev(Node<E> prev) {
-		this.prev = prev;
-	}
-
-	/**
-	 * @param next the next to set
-	 */
-	public void setNext(Node<E> next) {
-		this.next = next;
-	}
-
-	/**
-	 * @param element the element to set
-	 */
-	public void setElement(E element) {
-		this.element = element;
+	@Override
+	public Position<E> addAfter(Position<E> p, E element) throws IllegalArgumentException {
+		Node<E> tempNode = validate(p);
+		return addBetween(element, tempNode, tempNode.getNext());
 	}
 
 }
