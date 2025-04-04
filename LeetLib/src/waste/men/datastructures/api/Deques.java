@@ -1,5 +1,5 @@
 /**
- * 
+ * @author TW MANHEMA
  */
 package waste.men.datastructures.api;
 
