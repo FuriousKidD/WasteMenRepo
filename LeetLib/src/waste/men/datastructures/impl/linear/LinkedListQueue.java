@@ -12,7 +12,7 @@ public class LinkedListQueue <E> implements Queues<E>, Cloneable{
 	
 	private SLinkedList<E> listQue;
 	
-	public void LinkedListQueue() {
+	public LinkedListQueue() {
 		listQue = new SLinkedList<E>();
 	}
 	

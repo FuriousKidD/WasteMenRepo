@@ -20,6 +20,10 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 	public ArrayDeque() {this(CAPACITY);}
 	
 	@SuppressWarnings("unchecked")
+	/**
+	 * Constructor, takes an initial capacity size
+	 * @param capacity
+	 */
 	public ArrayDeque(int capacity) {
 		this.cap = capacity;
 		circleQue = (E[]) new Object[cap];
@@ -28,6 +32,9 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public Deques<E> clone() throws CloneNotSupportedException{
 		Deques<E> cloned = (ArrayDeque<E>) super.clone();
 		
@@ -42,9 +49,11 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 	}
 	
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addFirst(E e) {
-		// TODO Auto-generated method stub
-		
+	
 		/*
 		 * If the Deque is full, then that means the index in the array that 
 		 * comes before the front pointer is occupied.
@@ -54,7 +63,6 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 		if(size == cap) {
 			throw new IllegalStateException("Deque is FULL");
 		}
-		E temp = first();
 		
 		front = ( (front - 1) + cap) % cap;//moves the front pointer back by 1 index
 		circleQue[front] = e;
@@ -62,21 +70,23 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addLast(E e) {
-		// TODO Auto-generated method stub
 		if(size == cap) {
 			throw new IllegalStateException("Deque is FULL");
 		}
 		back = front + size % cap;
 		circleQue[back] = e;
 		size++;
-		
-		
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public E removeFirst() {
-		// TODO Auto-generated method stub
 		if(isEmpty()) {
 			throw new IllegalStateException("Cannot remove from an empty Deque");
 		}
@@ -88,8 +98,10 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public E removeLast() {
-		// TODO Auto-generated method stub
 		if(isEmpty()) {
 			throw new IllegalStateException("Cannot remove from an empty Deque");
 		}
@@ -101,28 +113,36 @@ public class ArrayDeque <E> implements Deques<E>, Cloneable{
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public E first() {
-		// TODO Auto-generated method stub
 		if(isEmpty()) return null;
 		return circleQue[front];
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public E last() {
-		// TODO Auto-generated method stub
 		if(isEmpty()) return null;
 		return circleQue[back-1];
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
 		return size == 0;
 	}
 
 	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public int size() {
-		// TODO Auto-generated method stub
 		return size;
 	}
 
