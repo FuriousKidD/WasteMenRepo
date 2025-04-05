@@ -1,3 +1,6 @@
+/**
+ * @author TW MANHEMA
+ */
 package waste.men.datastructures.api;
 /**
  * A collection of objects that are inserted and removed
