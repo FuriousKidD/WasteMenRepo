@@ -24,6 +24,7 @@ public class PriorityQueueHeap<K,V> extends AbstractPriorityQueueBase<K, V> {
 	 */
 	public PriorityQueueHeap() {
 		super();
+		heap = new ArrayList<>();
 	}
 	
 	/**
@@ -32,6 +33,7 @@ public class PriorityQueueHeap<K,V> extends AbstractPriorityQueueBase<K, V> {
 	 */
 	public PriorityQueueHeap(Comparator<K> comp) {
 		super(comp);
+		heap = new ArrayList<>();
 	}
 	
 	//utilities
