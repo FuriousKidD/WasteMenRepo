@@ -44,7 +44,7 @@ public class SLinkedList <E> implements LinkedListInterface<E>{
 	private Node tail;
 	//private Node next;
 	private int size = 0;
-	private E element;
+	
 	
 	public SLinkedList() {
 		head = tail =  null;

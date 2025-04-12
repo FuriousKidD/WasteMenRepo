@@ -3,8 +3,6 @@
  */
 package waste.men.datastructures.impl.linear;
 
-import waste.men.datastructures.api.*;
-
 /**
  * 
  */

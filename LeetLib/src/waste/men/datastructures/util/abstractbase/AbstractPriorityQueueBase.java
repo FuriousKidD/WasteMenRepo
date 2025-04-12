@@ -43,15 +43,14 @@ public abstract class AbstractPriorityQueueBase<K,V> implements PriorityQueue<K,
 		/**
 		 * Utility function for setting the key. To be used only by classes that inherit this
 		 */
-		protected void setKey(K key) {
+		public void setKey(K key) {
 			this.key = key;
 		}
 		
 		/**
 		 * Utility for setting the value. To be used by classes that inherit this one
-		 * @param value
 		 */
-		protected void setValue(V value) {
+		public void setValue(V value) {
 			this.value = value;
 		}
 		
