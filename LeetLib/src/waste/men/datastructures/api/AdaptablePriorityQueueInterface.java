@@ -15,8 +15,9 @@ public interface AdaptablePriorityQueueInterface <K,V>{
 	 * entry already exists in the list
 	 * @param entry
 	 * @return return the removed entry
+	 * @throws IllegalArgumentException
 	 */
-	public Entry<K, V> remove(Entry<K,V> entry);
+	public Entry<K, V> remove(Entry<K,V> entry) throws IllegalArgumentException;
 	
 	/**
 	 * Changes the key of an entry, thus changing the priority of the 
@@ -24,14 +25,16 @@ public interface AdaptablePriorityQueueInterface <K,V>{
 	 * @param entry
 	 * @param key
 	 * @return updated entry
+	 * @throws IllegalArgumentException
 	 */
-	public Entry<K, V> replaceKey(Entry<K, V> entry,K key);
+	public Entry<K, V> replaceKey(Entry<K, V> entry,K key) throws IllegalArgumentException;
 	
 	/**
 	 * Changes the value of a given entry.
 	 * @param entry
 	 * @param value
 	 * @return updated entry
+	 * @throws IllegalArgumentException
 	 */
-	public Entry<K, V> replaceValue(Entry<K, V> entry, V value);
+	public Entry<K, V> replaceValue(Entry<K, V> entry, V value) throws IllegalArgumentException;
 }
