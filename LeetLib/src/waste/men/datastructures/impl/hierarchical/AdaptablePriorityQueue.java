@@ -30,6 +30,7 @@ public class AdaptablePriorityQueue <K, V> extends PriorityQueueHeap<K, V>
 			index = i;
 		}
 		
+		
 	}//end of nested class
 	
 	/**
@@ -53,7 +54,7 @@ public class AdaptablePriorityQueue <K, V> extends PriorityQueueHeap<K, V>
 	 * Checks if the entry passed is location aware and returns the location aware entry
 	 * 
 	 */
-	protected AdaptablePQEntry<K, V> validate(PriorityQueueEntry<K, V> entry)
+	protected AdaptablePQEntry<K, V> validateEntry(Entry<K, V> entry)
 								throws IllegalArgumentException{
 		
 		if(!(entry instanceof AdaptablePQEntry)) {
@@ -68,15 +69,64 @@ public class AdaptablePriorityQueue <K, V> extends PriorityQueueHeap<K, V>
 		return locator;
 	}
 	
-	@Override
-	public Entry<K, V> remove(Entry<K, V> entry) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * swaps the entries in the given indices of the underlying arraylist
+	 * while updating and maintaining the location of the entries.
+	 */
+	protected void swap(int i, int j) {
+		super.swap(i, j);//performs the swap
+		((AdaptablePQEntry<K, V>) heap.get(i)).setIndex(i);//rest the entry's index
+		((AdaptablePQEntry<K, V>) heap.get(j)).setIndex(j);//reset the entry's index
+		
+	}
+	
+	/**
+	 * This restores the heap properties by moving the entry at the given index,
+	 * either through upheap or downheap.
+	 */
+	protected void bubble(int i) {
+		if(i > 0 && compare(heap.get(i),heap.get(parent(i))) < 0) {
+			upHeap(i);
+		}
+		else {
+			downHeap(i);
+		}
+	}
+	
+	public PriorityQueueEntry<K, V> insert(K key, V value) throws IllegalArgumentException{
+		validateKey(key);//check if the key is correct
+		PriorityQueueEntry<K, V> newEntry = new AdaptablePQEntry<>(key, value, heap.size());
+		heap.add(newEntry);//add to the end of the list
+		upHeap(heap.size() - 1);//upheap the newly added entry
+		return  newEntry;
 	}
 	
 	@Override
-	public Entry<K, V> replaceKey(Entry<K, V> entry, K key) {
-		// TODO Auto-generated method stub
+	/**
+	 * {@inheritDoc}
+	 */
+	public Entry<K, V> remove(Entry<K, V> entry) throws IllegalArgumentException{
+		validateEntry(entry);
+		Entry<K, V> removed = entry;
+		int i = ((AdaptablePQEntry<K, V>)entry).getIndex();
+		
+		if(i == heap.size() - 1) {//entry is already at the end so no need for bubble
+			heap.remove(i);
+		}
+		else {
+			swap(i, heap.size() - 1);//swap the index of given entry with last index
+			heap.remove(heap.size() - 1);//remove the entry
+			bubble(i);			
+		}
+		return removed;
+	}
+	
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public Entry<K, V> replaceKey(Entry<K, V> entry, K key) throws IllegalArgumentException{
+		
 		return null;
 	}
 	
