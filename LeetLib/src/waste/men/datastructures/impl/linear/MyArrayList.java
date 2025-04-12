@@ -10,37 +10,25 @@ import java.util.Iterator;
  */
 public class MyArrayList <E> implements Iterable<E>{
 	
-	private final int DEFUALT_CAPACITY = 16;
-	private static final int  RESIZE = 2;
-	private int capacity = DEFUALT_CAPACITY;
-	private int size = 0;
-	
+	private static final int DEFUALT_CAPACITY = 16;
+	private static int capacity = DEFUALT_CAPACITY;
+	private int size = 0;	
 	private E[] arrList;
-	private int resizeType = 0;
-	private boolean incremental = false;
-	private boolean doubling = false;
-	
+
 	/**
 	 * Default Constructor
 	 */
 	public MyArrayList() {
-		this(RESIZE);
+		this(capacity);
 	}
 	
 	/**
 	 * Parameterized constructor
-	 * @param resizeType 1 for Incremental method and 2 for Double method
+	 * @param initialCapacity
 	 */
 	@SuppressWarnings("unchecked")
-	public MyArrayList(int resizeType) {
-		this.resizeType = resizeType;
-		if(resizeType > 2 || resizeType < 1)
-			resizeType = 2;
-		if(resizeType == 1) 
-			incremental = true;
-		else if(resizeType == 2)
-			doubling = true;
-		
+	public MyArrayList(int initialCapacity) {
+		capacity = initialCapacity;
 		arrList = (E[]) new Object[capacity];
 	}
 	
@@ -60,35 +48,24 @@ public class MyArrayList <E> implements Iterable<E>{
 	 */
 	@SuppressWarnings("unchecked")
 	private void expandArray(int length) {
-		if(length == capacity) {
-			if(doubling) {
-				length*=2;
-				E[] arrNew = (E[]) new Object[length];
-				System.arraycopy(arrList, 0, arrNew, size - 1, length);
-				this.capacity = length;
-			}
-			else if(incremental) {
-
-				length += 10;
-				E[] arrNew = (E[]) new Object[length];
-				System.arraycopy(arrList, 0, arrNew, size - 1, length);
-				this.capacity = length;
-			}
+		if(length >= capacity) {	
+			length*=2;
+			E[] arrNew = (E[]) new Object[length];
+			System.arraycopy(arrList, 0, arrNew, size - 1, length);
+			capacity = length;
 		}
 	}
 	
 	private class MyArrayListIterator implements Iterator<E>{
-		
 		int j = 0;
+		
 		@Override
 		public boolean hasNext() {
-			// TODO Auto-generated method stub
 			return j < size;
 		}
 
 		@Override
 		public E next(){
-			// TODO Auto-generated method stub
 			if(j >= size)
 				throw new IllegalStateException("Reached End of List!");
 			
@@ -99,8 +76,6 @@ public class MyArrayList <E> implements Iterable<E>{
 	
 	@Override
 	public Iterator<E> iterator() {
-		// TODO Auto-generated method stub
 		return new MyArrayListIterator();
 	}
-
 }
