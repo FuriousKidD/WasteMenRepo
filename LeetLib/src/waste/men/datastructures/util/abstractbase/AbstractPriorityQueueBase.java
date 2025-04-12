@@ -63,6 +63,7 @@ public abstract class AbstractPriorityQueueBase<K,V> implements PriorityQueue<K,
 	
 	/**
 	 * This method compares the two entries according to their keys
+	 * @return 0 if they are equal. -1 if o1 < o2. 1 if o1 > o2.
 	 */
 	protected int compare(Entry<K, V> o1, Entry<K, V> o2) {
 		return comp.compare(o1.getKey(), o2.getKey());

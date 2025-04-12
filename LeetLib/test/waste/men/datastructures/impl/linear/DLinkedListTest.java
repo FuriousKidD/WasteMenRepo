@@ -32,7 +32,7 @@ public class DLinkedListTest {
 	 * Testing the isEmpty() method
 	 */
 	void emptyListTest() {
-		assertTrue(list.isEmpty());//should return true
+		assertTrue(list.isEmpty(), "New list should be currenlty empty");//should return true
 		assertEquals(0, list.size());//should return true
 	}
 	
