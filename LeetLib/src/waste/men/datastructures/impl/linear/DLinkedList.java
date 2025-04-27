@@ -1,6 +1,10 @@
 package waste.men.datastructures.impl.linear;
 
+import waste.men.datastructures.api.Iterator;
+import java.util.NoSuchElementException;
+
 import waste.men.datastructures.api.*;
+import waste.men.datastructures.api.Iterable;
 
 public class DLinkedList <E> implements PositionalList<E>{
 	
@@ -244,5 +248,83 @@ public class DLinkedList <E> implements PositionalList<E>{
 		Node<E> tempNode = validate(p);
 		return addBetween(element, tempNode, tempNode.getNext());
 	}
+	
+	//Inner class for the iterator
+	private class PositionIterator implements Iterator<Position<E>>{
 
+		//variables for the iterator
+		private Position<E> cursor = first();//the position of the next element to call
+		private Position<E> current = null;//the position of the last called element
+		
+		@Override
+		public boolean hasNext() {
+			// TODO Auto-generated method stub
+			return (cursor != null);
+		}
+
+		@Override
+		public Position<E> next() {
+			// TODO Auto-generated method stub
+			if(cursor == null) {
+				throw new NoSuchElementException("Nothing left!");
+			}
+			current = cursor;
+			cursor = after(current);
+			return current;
+		}
+	}//end of inner position iterator class
+	
+	private class PositionIterable implements Iterable<Position<E>>{
+
+		@Override
+		public Iterator<Position<E>> iterator() {
+			// TODO Auto-generated method stub
+			return new PositionIterator();
+		}
+	}//end of iterable inner class
+	
+	public Iterable<Position<E>> positions(){
+		return new PositionIterable();
+	}
+	
+	//This class adapts the iteration used to get positions, for returning the elements of those positions
+	private class ElementIterator implements Iterator<E>{
+		
+		Iterator<Position<E>> pIterator = new PositionIterator();
+		
+		@Override
+		public boolean hasNext() {
+			// TODO Auto-generated method stub
+			return pIterator.hasNext();
+		}
+
+		@Override
+		public E next() throws IllegalStateException {
+			// TODO Auto-generated method stub
+			return pIterator.next().getElement();
+		}
+	}//end of inner class
+	
+	/**
+	 * @return iterator of elements
+	 */
+	public Iterator<E> iterator(){
+		return new ElementIterator();
+	}
+	
+	/**
+	 * Checks if the given element exists
+	 * @param element
+	 * @return
+	 */
+	public boolean contains(E element) {
+		Position<E> current = header.getNext();
+		while (current != trailer) {
+			if (current.getElement().equals(element)) {
+				return true;
+			}
+			current = ((Node<E>) current).getNext();
+		}
+		return false;
+	}
 }
