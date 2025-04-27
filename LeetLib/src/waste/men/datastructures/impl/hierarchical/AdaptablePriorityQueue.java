@@ -30,7 +30,6 @@ public class AdaptablePriorityQueue <K, V> extends PriorityQueueHeap<K, V>
 			index = i;
 		}
 		
-		
 	}//end of nested class
 	
 	/**
@@ -106,9 +105,9 @@ public class AdaptablePriorityQueue <K, V> extends PriorityQueueHeap<K, V>
 	 * {@inheritDoc}
 	 */
 	public Entry<K, V> remove(Entry<K, V> entry) throws IllegalArgumentException{
-		validateEntry(entry);
+		AdaptablePQEntry<K, V> locator = validateEntry(entry);
 		Entry<K, V> removed = entry;
-		int i = ((AdaptablePQEntry<K, V>)entry).getIndex();
+		int i = locator.getIndex();
 		
 		if(i == heap.size() - 1) {//entry is already at the end so no need for bubble
 			heap.remove(i);
@@ -126,14 +125,19 @@ public class AdaptablePriorityQueue <K, V> extends PriorityQueueHeap<K, V>
 	 * {@inheritDoc}
 	 */
 	public Entry<K, V> replaceKey(Entry<K, V> entry, K key) throws IllegalArgumentException{
-		
-		return null;
+		validateEntry(entry);
+		validateKey(key);
+		AdaptablePQEntry<K, V> locator = (AdaptablePQEntry<K, V>)entry;
+		locator.setKey(key);//log issue: setKey needs to be protected not public
+		bubble(locator.getIndex());
+		return locator;
 	}
 	
 	@Override
 	public Entry<K, V> replaceValue(Entry<K, V> entry, V value) {
-		// TODO Auto-generated method stub
-		return null;
+		AdaptablePQEntry<K, V> locator = validateEntry(entry);
+		locator.setValue(value);
+		return locator;
 	}
 }
 
