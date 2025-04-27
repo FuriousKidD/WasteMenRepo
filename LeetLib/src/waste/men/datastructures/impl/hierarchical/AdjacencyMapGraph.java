@@ -35,7 +35,7 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 		 */
 		private Map<IVertex<V>, IEdge<E>> outgoing, incoming;
 		
-		public Vertex(V element, boolean isDirected) {
+		public Vertex(V element) {
 			this.element = element;
 			
 			outgoing = new ConcurrentHashMap<IVertex<V>,IEdge<E>>();
@@ -84,12 +84,18 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 		private Position<IEdge<E>> p;
 		private IVertex<V>[] endpoints;
 		
+		//private IVertex<V> v,u;//end points
+		
 		@SuppressWarnings("unchecked")
 		public Edge(IVertex<V> v, IVertex<V> u, E element) {
 			this.element = element;
-			endpoints = (IVertex<V>[]) new Object[] {v,u};//an array of length 2.
+			endpoints = new IVertex[] {v,u};//an array of length 2.
 		}
 		
+		/**
+		 * {@inheritDoc}
+		 * @return
+		 */
 		public IVertex<V>[] getEndPoints(){
 			return this.endpoints;
 		}
@@ -115,11 +121,11 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 		@Override
 		public IVertex<?> getOpposite(IVertex<?> v) {
 			// TODO Auto-generated method stub
-			if(endpoints[0].getElement().equals(v)) {
-				return (IVertex<?>) endpoints[1].getElement();
+			if(((Vertex) endpoints[0]).equals(v)) {
+				return (IVertex<?>) endpoints[1];
 			}
-			else if(endpoints[1].getElement().equals(v)) {
-				return (IVertex<?>) endpoints[0].getElement();
+			else if(( (Vertex) endpoints[1]).equals(v)) {
+				return (IVertex<?>) endpoints[0];
 			}
 			return null;
 		}
@@ -165,7 +171,7 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 	 */
 	public IVertex<V> insertVertex(V element) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
-		Vertex newVertex = new Vertex(element, isDirected);
+		Vertex newVertex = new Vertex(element);
 		newVertex.setPosition(vertices.addLast(newVertex));
 		return vertices.last().getElement();//returns the element of the inserted vertex
 	}
@@ -226,7 +232,7 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 	public IVertex<V>[] endVertices(IEdge<E> edge) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
 		Edge e = (Edge) edge; 
-		return e.getEndPoints();
+		return (IVertex<V>[]) e.getEndPoints();
 	}
 
 	@Override
@@ -322,10 +328,8 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 			Edge nextEdge = (Edge)itrInciEdges.next();
 			neighborVertices.addLast((IVertex<V>) nextEdge.getOpposite(vertex));//adds the vertex that is opposite the given vertex in the same edge
 		}
-		
 		return neighborVertices.iterator();
 		*/
-		
 	}
 
 	@Override
@@ -390,7 +394,6 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 	 * {@inheritDoc}
 	 */
 	public IVertex<V> opposite(IVertex<V> v, IEdge<E> edge) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
 		return (IVertex<V>) edge.getOpposite(v);//will be safe since insertEdge enforces type safety
 	}
 
@@ -399,7 +402,6 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements 
 	 * {@inheritDoc}
 	 */
 	public int outDegree(IVertex<V> v) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
 		validateVertex(v);
 		Vertex vert = (Vertex)v;
 		return vert.getOutgoing().size();
