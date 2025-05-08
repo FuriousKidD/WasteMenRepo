@@ -3,6 +3,7 @@
  */
 package waste.men.datastructures.impl.hierarchical;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,7 +18,13 @@ import waste.men.datastructures.api.Iterator;
 /**
  * 
  */
-public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> implements IGraph<V, E>{
+public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E> 
+									implements IGraph<V, E>, Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Vertex/Node class which will contain objects of type V

@@ -1,13 +1,20 @@
 package waste.men.datastructures.impl.linear;
 
 import waste.men.datastructures.api.Iterator;
+
+import java.io.Serializable;
 import java.util.NoSuchElementException;
 
 import waste.men.datastructures.api.*;
 import waste.men.datastructures.api.Iterable;
 
-public class DLinkedList <E> implements PositionalList<E>{
+public class DLinkedList <E> implements PositionalList<E>, Serializable{
 	
+	/**
+	 * Defualt Serial ID
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 
 	 */
