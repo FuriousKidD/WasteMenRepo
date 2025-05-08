@@ -3,6 +3,7 @@
  */
 package waste.men.datastructures.impl.hierarchical;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -13,8 +14,13 @@ import waste.men.datastructures.util.abstractbase.AbstractPriorityQueueBase;
  * A realization of the priority queue data structure, using a Heap Binary tree for
  * its implementation
  */
-public class PriorityQueueHeap<K,V> extends AbstractPriorityQueueBase<K, V> {
+public class PriorityQueueHeap<K,V> extends AbstractPriorityQueueBase<K, V>
+									implements Serializable{
 
+	/**
+	 * Defualt Serial ID
+	 */
+	private static final long serialVersionUID = 1L;
 	//the heap, which will be an array list of entries
 	protected ArrayList<Entry<K, V>> heap;
 	
