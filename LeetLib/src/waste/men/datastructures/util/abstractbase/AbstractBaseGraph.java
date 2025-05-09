@@ -5,6 +5,8 @@ package waste.men.datastructures.util.abstractbase;
 
 import waste.men.datastructures.api.Iterator;
 
+import java.io.Serializable;
+
 import waste.men.datastructures.api.IEdge;
 import waste.men.datastructures.api.IGraph;
 import waste.men.datastructures.api.IVertex;
@@ -13,8 +15,12 @@ import waste.men.datastructures.api.IVertex;
  * Some of the methods called, will be realized by the various implementations of this 
  * abstract base class
  */
-public abstract class AbstractBaseGraph<V, E> implements IGraph<V, E> {
+public abstract class AbstractBaseGraph<V, E> implements IGraph<V, E>, Serializable {
 	
+	/**
+	 * Default Serialiable ID
+	 */
+	private static final long serialVersionUID = 1L;
 	protected final boolean isDirected;
 	
 	protected AbstractBaseGraph(boolean isDirected) {
