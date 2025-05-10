@@ -144,7 +144,7 @@ public class AdjacencyMapGraph<V, E> extends AbstractBaseGraph<V, E>
 	private DLinkedList<IEdge<E>> edges = new DLinkedList<>();//cintains the edges of the graph
 	
 	public AdjacencyMapGraph(boolean isDirected) {
-		super(isDirected);
+		super(isDirected, true);
 		this.isDirected = isDirected;
 	}
 

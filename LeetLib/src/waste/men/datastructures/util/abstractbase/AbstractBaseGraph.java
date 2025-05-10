@@ -22,9 +22,11 @@ public abstract class AbstractBaseGraph<V, E> implements IGraph<V, E>, Serializa
 	 */
 	private static final long serialVersionUID = 1L;
 	protected final boolean isDirected;
+	private final boolean selfLoppAllowed;
 	
-	protected AbstractBaseGraph(boolean isDirected) {
+	protected AbstractBaseGraph(boolean isDirected, boolean selfLoopAllowed) {
 		this.isDirected = isDirected;
+		this.selfLoppAllowed = selfLoopAllowed;
 	}
 	
 	//Protected Utitlity methods
@@ -35,6 +37,9 @@ public abstract class AbstractBaseGraph<V, E> implements IGraph<V, E>, Serializa
 	 * @throws IllegalArgumentException
 	 */
 	protected void validateVertex(IVertex<V> vertex) throws IllegalArgumentException{
+		if(this.selfLoppAllowed) {
+			return;
+		}
 		if(!containsVertex(vertex)) {
 			throw new IllegalArgumentException("Vertex " + vertex + " not found!");
 		}
@@ -46,9 +51,9 @@ public abstract class AbstractBaseGraph<V, E> implements IGraph<V, E>, Serializa
 	 * @throws IllegalArgumentException
 	 */
 	protected void validateEdge(IEdge<E> edge) throws IllegalArgumentException {
-		if(!containsEdge(edge)) {
+		/*if(!containsEdge(edge)) {
 			throw new IllegalArgumentException("Edge " + edge + "not found!");
-		}
+		}*/
 	}
 	
 	@Override
