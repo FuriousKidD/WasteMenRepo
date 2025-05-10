@@ -6,6 +6,7 @@ package waste.men.datastructures.impl.hierarchical;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import waste.men.datastructures.api.IEdge;
 import waste.men.datastructures.api.IGraph;
 import waste.men.datastructures.api.IVertex;
 import waste.men.datastructures.api.Iterator;
+import waste.men.datastructures.impl.linear.DLinkedList;
 import waste.men.datastructures.util.abstractbase.AbstractBaseGraph;
 
 /**
@@ -93,17 +95,17 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		
 	}
 	
-	 private List<IVertex<V>> vertexList;
+	private List<IVertex<V>> vertexList;
     private Map<IVertex<V>, Integer> vertexIndexMap;
     private List<Map<Integer, IEdge<E>>> adjacencyMatrix;
     private Set<IEdge<E>> edges;
     private Map<IVertex<V>, double[]> vertexFeatures;
-    private Map<IVertex<V>, Integer> vertexLabels;
-    private Integer graphLabel = null;
+    private Map<IVertex<V>, double[]> vertexLabels;
+    private double[] graphLabel = null;
     private int numClasses;
 
-	protected AdjacencyMatrixGraph(boolean isDirected, int numClasses) {
-		super(isDirected);
+	public AdjacencyMatrixGraph(boolean isDirected, int numClasses) {
+		super(isDirected, true);
 		// TODO Auto-generated constructor stub
 		this.vertexList = new ArrayList<>();
 		this.vertexIndexMap = new ConcurrentHashMap<>();
@@ -125,11 +127,14 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		return this.edges.size();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<IVertex<V>> vertices() {
 		// TODO Auto-generated method stub
-		return (Iterator<IVertex<V>>) vertexList.iterator();
+		DLinkedList<IVertex<V>> lst = new DLinkedList<>();
+		for(int i = 0; i < vertexList.size(); i++) {
+			lst.addLast(vertexList.get(i));
+		}
+		return (Iterator<IVertex<V>>) lst.iterator();
 	}
 
 	@Override
@@ -176,11 +181,15 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		rebuildIndex();//ensures that the vertices are at their correct index.
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<IEdge<E>> edges() {
 		// TODO Auto-generated method stub
-		return (Iterator<IEdge<E>>)edges.iterator();
+		
+		DLinkedList<IEdge<E>> lst = new DLinkedList<>();
+		for(int i = 0; i < edges.size(); i++) {
+			lst.addLast(edges.iterator().next());
+		}
+		return (Iterator<IEdge<E>>)lst.iterator();
 	}
 
 	@Override
@@ -233,7 +242,6 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		edges.remove(edge);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<IVertex<V>> neighbors(IVertex<V> vertex) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
@@ -241,25 +249,29 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		
 		int index = vertexIndexMap.get(vertex);//retrieve the index of the vertex
 		
-		List<IVertex<V>> neighbors = new ArrayList<>();
+		DLinkedList<IVertex<V>> neighbors = new DLinkedList<>();
 		
 		//Iterates through the set of edges that are associated with vertex
 		for(Integer j : adjacencyMatrix.get(index).keySet()) {
-			neighbors.add(vertexList.get(j));
+			neighbors.addLast(vertexList.get(j));
 		}
 		
 		return (Iterator<IVertex<V>>)neighbors.iterator();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<IEdge<E>> incidentEdges(IVertex<V> vertex) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
 		validateVertex(vertex);
 		
 		int index = vertexIndexMap.get(vertex);//get the index for the edge connecting 
-	
-		return (Iterator<IEdge<E>>)adjacencyMatrix.get(index).values().iterator();
+		DLinkedList<IEdge<E>> lst = new DLinkedList<>();
+		Collection<IEdge<E>> cl = adjacencyMatrix.get(index).values();
+		
+		for(int i = 0; i < cl.size(); i++) {
+			lst.addLast(cl.iterator().next());
+		}
+		return (Iterator<IEdge<E>>)lst.iterator();
 	}
 
 	@Override
@@ -309,5 +321,103 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		}
 		return count;
 	}
-
+	
+	public void setVertexFeature(IVertex<V> vertex, double[] features) {
+		validateVertex(vertex);
+		vertexFeatures.put(vertex, features);
+	}
+	
+	public double[] getVertexFeature(IVertex<V> vertex) {
+		validateVertex(vertex);
+		return vertexFeatures.get(vertex);
+	}
+	
+	public void setVertexLabel(IVertex<V> vertex, double[] label) {
+		validateVertex(vertex);
+		vertexLabels.put(vertex, label);
+	}
+	
+	public double[] getVertexLabel(IVertex<V> vertex) {
+		validateVertex(vertex);
+		return vertexLabels.get(vertex);
+	}
+	
+	public void setGraphLLabel(double[] label) {
+		this.graphLabel = label;
+	}
+	
+	public double[] getGraphLabel() {
+		return graphLabel;
+	}
+	
+	/*
+	 * Creates a matrix of the vertex features and returns that matrix
+	 */
+	public double[][] getFeatureMatrix(){
+		
+		double[][] matrix = new double[vertexList.size()][];
+		
+		//Gets the features in the vertex map and if no feature found, a default row is porpulated to the matrix
+		for(int i = 0; i < vertexList.size(); i++) {
+			matrix[i] = vertexFeatures.getOrDefault(vertexList.get(i), new double[0]);
+		}
+		return matrix;
+	}
+	
+	public double[][] getVertexLabelMatrix() {
+		
+		double[][] matrix = new double[vertexList.size()][];
+		
+		//Gets the labels in the vertex map and if no feature found, a default row is porpulated to the matrix
+		for(int i = 0; i < vertexList.size(); i++) {
+			matrix[i] = vertexLabels.getOrDefault(vertexList.get(i), new double[0]);
+		}
+		return matrix;
+	}
+	
+	public double[][] getGraphLabelMatrix() {
+		return new double[][] {getGraphLabel()};
+	}
+	
+	/*
+	 * The following lines of code are utilities for this matrix class
+	 */
+	
+	//adding self loops to all nodes will help with normalizing the GCN
+	public void addSelfLoops(E val) {
+		for(IVertex<V> vert : vertexList) {
+			if(getEdge(vert, vert) == null) {
+				insertEdge(vert, vert, val);
+				System.out.println("Adding Self loops");
+			}
+		}
+	}
+	
+	/*
+	 * Creates a normalized adjacency matrix and returns it
+	 */
+	public double[][] getNormalizedAdjacencyMatrix(){
+		
+		int n = vertexList.size();
+		double[][] normAdj = new double[n][n];
+		addSelfLoops(null);
+		double[] degree = new double[n];
+		
+		System.out.println("Adjacency matrix with self-loops:");
+		for (int i = 0; i < n; i++) {
+		    System.out.println("Vertex " + i + ": " + adjacencyMatrix.get(i).keySet());
+		}
+		
+		for(int i = 0; i < n; i++) {
+			degree[i] = adjacencyMatrix.get(i).size();
+		}
+		
+		for(int i = 0; i < n; i++) {
+			for(Map.Entry<Integer, IEdge<E>> entry : adjacencyMatrix.get(i).entrySet()) {
+				int j = entry.getKey();
+			}
+		}
+		return normAdj;
+	}
+	
 }
