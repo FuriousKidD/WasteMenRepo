@@ -20,6 +20,7 @@ import waste.men.datastructures.api.IGraph;
 import waste.men.datastructures.api.IVertex;
 import waste.men.datastructures.api.Iterator;
 import waste.men.datastructures.impl.linear.DLinkedList;
+import waste.men.datastructures.util.MatrixGraphUtils;
 import waste.men.datastructures.util.abstractbase.AbstractBaseGraph;
 
 /**
@@ -101,8 +102,10 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
     private Set<IEdge<E>> edges;
     private Map<IVertex<V>, double[]> vertexFeatures;
     private Map<IVertex<V>, double[]> vertexLabels;
+    private final Map<V, IVertex<V>> elementToVertex; 
     private double[] graphLabel = null;
     private int numClasses;
+    private boolean selfLoopsAdded = false;
 
 	public AdjacencyMatrixGraph(boolean isDirected, int numClasses) {
 		super(isDirected, true);
@@ -111,6 +114,7 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		this.vertexIndexMap = new ConcurrentHashMap<>();
 		this.adjacencyMatrix = new ArrayList<>();
 		this.edges = new HashSet<>();
+		 this.elementToVertex = new HashMap<>();
 		this.vertexFeatures = new ConcurrentHashMap<>();
 		this.vertexLabels = new ConcurrentHashMap<>();
 	}
@@ -140,13 +144,14 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 	@Override
 	public IVertex<V> insertVertex(V element) throws IllegalArgumentException {
 		// TODO Auto-generated method stub
-		Vertex vert = new Vertex(element);
-		if(vertexIndexMap.containsKey(vert)) {
+		if(elementToVertex.containsKey(element)) {
 			throw new IllegalArgumentException("Vertex already exists");
 		}
+		Vertex vert = new Vertex(element);
 		vertexList.add(vert);
 		vertexIndexMap.put(vert, vertexList.size() - 1);
 		adjacencyMatrix.add(new HashMap<>());
+		elementToVertex.put(element, vert);
 		return (IVertex<V>) vert;
 	}
 
@@ -217,13 +222,42 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		
 		//put the edge and u's index in the adjacency matrix
 		adjacencyMatrix.get(i).put(j, edge);
-		if(!isDirected){
+		if(!isDirected && i != j){
 			//put the edge and v's index in the adjacency matrix
 			adjacencyMatrix.get(j).put(i, edge);
 		}
 		edges.add(edge);
 		return edge;
 	}
+	
+	@Override
+	/*
+	 * Overriding the getEdge method from the abstract base which is specific for this class
+	 */
+	public IEdge<E> getEdge(IVertex<V> v, IVertex<V> u) throws IllegalArgumentException {
+	    validateVertex(v);
+	    validateVertex(u);
+
+	    int i = vertexIndexMap.get(v);
+	    int j = vertexIndexMap.get(u);
+
+	    // Check the direct connection from v to u
+	    IEdge<E> edge = adjacencyMatrix.get(i).get(j);
+	    if (edge != null) {
+	        return edge;
+	    }
+
+	    // In undirected graphs, also check the reverse direction if not a self-loop
+	    if (!isDirected && i != j) {
+	        edge = adjacencyMatrix.get(j).get(i);
+	        if (edge != null) {
+	            return edge;
+	        }
+	    }
+
+	    return null; // No edge found
+	}
+
 
 	@Override
 	public void removeEdge(IEdge<E> edge) throws IllegalArgumentException {
@@ -342,7 +376,7 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 		return vertexLabels.get(vertex);
 	}
 	
-	public void setGraphLLabel(double[] label) {
+	public void setGraphLabel(double[] label) {
 		this.graphLabel = label;
 	}
 	
@@ -384,40 +418,43 @@ public class AdjacencyMatrixGraph <V, E> extends AbstractBaseGraph<V, E>
 	 */
 	
 	//adding self loops to all nodes will help with normalizing the GCN
-	public void addSelfLoops(E val) {
-		for(IVertex<V> vert : vertexList) {
-			if(getEdge(vert, vert) == null) {
-				insertEdge(vert, vert, val);
-				System.out.println("Adding Self loops");
-			}
-		}
-	}
+	 public void addSelfLoops(E value) {
+        if (selfLoopsAdded) return;
+        for (IVertex<V> v : vertexList) {
+            if (getEdge(v, v) == null) {
+                try {
+                    insertEdge(v, v, value);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Failed to insert self-loop for " + v + ": " + e.getMessage());
+                }
+            }
+        }
+        selfLoopsAdded = true;
+	    }
+
 	
 	/*
 	 * Creates a normalized adjacency matrix and returns it
 	 */
-	public double[][] getNormalizedAdjacencyMatrix(){
-		
-		int n = vertexList.size();
-		double[][] normAdj = new double[n][n];
-		addSelfLoops(null);
-		double[] degree = new double[n];
-		
-		System.out.println("Adjacency matrix with self-loops:");
-		for (int i = 0; i < n; i++) {
-		    System.out.println("Vertex " + i + ": " + adjacencyMatrix.get(i).keySet());
-		}
-		
-		for(int i = 0; i < n; i++) {
-			degree[i] = adjacencyMatrix.get(i).size();
-		}
-		
-		for(int i = 0; i < n; i++) {
-			for(Map.Entry<Integer, IEdge<E>> entry : adjacencyMatrix.get(i).entrySet()) {
-				int j = entry.getKey();
-			}
-		}
-		return normAdj;
-	}
+	 public double[][] getNormalizedAdjacencyMatrix() {
+	 	int n = vertexList.size();
+        double[][] normAdj = new double[n][n];
+
+        // Ensure self-loops exist before normalization
+        addSelfLoops(null);
+
+        double[] degree = new double[n];
+        for (int i = 0; i < n; i++) {
+            degree[i] = adjacencyMatrix.get(i).size();
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (Map.Entry<Integer, IEdge<E>> entry : adjacencyMatrix.get(i).entrySet()) {
+                int j = entry.getKey();
+                normAdj[i][j] = 1.0 / Math.sqrt(degree[i] * degree[j]);
+            }
+        }
+        return normAdj;
+    }
 	
 }
