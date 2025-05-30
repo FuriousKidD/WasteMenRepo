@@ -42,6 +42,15 @@ public class PriorityQueueHeap<K,V> extends AbstractPriorityQueueBase<K, V>
 		heap = new ArrayList<>();
 	}
 	
+	/**
+	 * Constructor with user defined comparator passed as parameter
+	 * @param comp
+	 */
+	public PriorityQueueHeap(int initialCapacity, Comparator<K> comp) {
+		super(comp);
+		heap = new ArrayList<>(initialCapacity);
+	}
+	
 	//utilities
 	
 	//parent of a given node based on index of an array
